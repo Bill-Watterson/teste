@@ -1,116 +1,61 @@
 ```mermaid
-classDiagram
-    %% --- EXCEÇÕES ---
-    class LanchoneteError { <<exception>> }
-    class MesaOcupadaError { <<exception>> }
-    class MesaNaoEncontradaError { <<exception>> }
-    class AtendimentoEncerradoError { <<exception>> }
-    class AtendimentoNaoEncontradoError { <<exception>> }
-    class ProdutoNaoEncontradoError { <<exception>> }
-    class QuantidadeInvalidaError { <<exception>> }
-    class PagamentoInvalidoError { <<exception>> }
-    class AtendimentoNaoQuitadoError { <<exception>> }
-
-    LanchoneteError <|-- MesaOcupadaError
-    LanchoneteError <|-- MesaNaoEncontradaError
-    LanchoneteError <|-- AtendimentoEncerradoError
-    LanchoneteError <|-- AtendimentoNaoEncontradoError
-    LanchoneteError <|-- ProdutoNaoEncontradoError
-    LanchoneteError <|-- QuantidadeInvalidaError
-    LanchoneteError <|-- PagamentoInvalidoError
-    LanchoneteError <|-- AtendimentoNaoQuitadoError
-
-    %% --- MODELOS ---
-    class Mesa {
-        -int __numero
-        -bool __ocupada
-        +numero() int
-        +ocupada() bool
-        +ocupar() void
-        +desocupar() void
+erDiagram
+    %% --- ENTIDADES E ATRIBUTOS ---
+    PESSOA {
+        int id_pessoa PK
+        string nome
+        string cpf
+        string email
     }
 
-    class Produto {
-        <<abstract>>
-        -int __codigo
-        -string __nome
-        -float __preco
-        -bool __disponivel
-        +descricao_detalhada()* string
+    CLIENTE {
+        string numero_passaporte
     }
 
-    class Suco { -string __tamanho }
-    class Sanduiche { -string __pao }
-    class SaladaDeFrutas { -string __adicional }
-
-    Produto <|-- Suco
-    Produto <|-- Sanduiche
-    Produto <|-- SaladaDeFrutas
-
-    class Pedido {
-        -int __quantidade
-        +valor_total() float
+    CONSULTOR {
+        date data_contratacao
     }
 
-    class Pagamento {
-        -float __valor
+    SERVICO {
+        int id_servico PK
+        string descricao
+        float valor_base
     }
 
-    class Atendimento {
-        -bool __ativo
-        +total() float
-        +total_pago() float
-        +saldo() float
-        +adicionar_pedido(p: Pedido) void
-        +registrar_pagamento(p: Pagamento) void
-        +encerrar() void
+    PROCESSO {
+        int id_processo PK
+        date data_inicio
+        string status_geral
     }
 
-    Atendimento "1" *-- "0..*" Pedido
-    Atendimento "1" *-- "0..*" Pagamento
-    Mesa "1" <-- "0..*" Atendimento
-    Pedido "*" --> "1" Produto
-
-    %% --- APLICAÇÃO ---
-    class Lanchonete {
-        -list~Mesa~ __mesas
-        -list~Produto~ __produtos
-        -list~Atendimento~ __atendimentos
-        -list~Atendimento~ __historico
+    DOCUMENTO {
+        int id_documento PK
+        string tipo_documento
+        string status_validacao
     }
 
-    Lanchonete "1" o-- "*" Mesa
-    Lanchonete "1" o-- "*" Produto
-    Lanchonete "1" o-- "*" Atendimento
+    PAIS {
+        int id_pais PK
+        string nome
+        string continente
+    }
 
-    %% --- INTERFACE ---
-    class Menu { <<abstract>> #Lanchonete _lanchonete }
-    class MenuPrincipal
-    class MenuMesas
-    class MenuProdutos
-    class MenuAtendimentos
+    ESPECIALIDADE {
+        int id_especialidade PK
+        int id_pessoa FK
+        int id_pais FK
+    }
 
-    Menu <|-- MenuPrincipal
-    Menu <|-- MenuMesas
-    Menu <|-- MenuProdutos
-    Menu <|-- MenuAtendimentos
+    %% --- HERANÇA / ESPECIALIZAÇÃO (D) ---
+    PESSOA ||--o| CLIENTE : "Disjunção (D)"
+    PESSOA ||--o| CONSULTOR : "Disjunção (D)"
 
-    class Tela { <<abstract>> #Lanchonete _lanchonete }
-    class TelaMesas
-    class TelaProdutos
-    class TelaAtendimentos
-
-    Tela <|-- TelaMesas
-    Tela <|-- TelaProdutos
-    Tela <|-- TelaAtendimentos
-
-    MenuMesas --> TelaMesas
-    MenuProdutos --> TelaProdutos
-    MenuAtendimentos --> TelaAtendimentos
-
-    MenuPrincipal --> MenuMesas
-    MenuPrincipal --> MenuProdutos
-    MenuPrincipal --> MenuAtendimentos
-
-    Tela --> Lanchonete
+    %% --- RELACIONAMENTOS E CARDINALIDADES ---
+    CLIENTE ||--o{ PROCESSO : "SOLICITA (1,1 : 0,N)"
+    SERVICO ||--o{ PROCESSO : "GERA (1,1 : 0,N)"
+    CONSULTOR ||--o{ PROCESSO : "GERENCIA (1,1 : 0,N)"
+    PROCESSO ||--|{ DOCUMENTO : "EXIGE (1,1 : 1,N)"
+    PROCESSO }|--|| PAIS : "DESTINO (1,1 : 1,1)"
+    CONSULTOR ||--|{ ESPECIALIDADE : "ESPECIALISTA (0,N : 1,N)"
+    PAIS ||--o{ ESPECIALIDADE : "associa (0,N : 0,N)"
 ```
