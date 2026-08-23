@@ -1,9 +1,11 @@
 ```mermaid
-graph TD
-    %% --- ESTILOS DE NÓS (NOTAÇÃO DE CHEN) ---
-    classDef entidade fill:#ffffff,stroke:#000000,stroke-width:2px;
-    classDef atributo fill:#ffffff,stroke:#000000,stroke-width:1px;
-    classDef relacao fill:#ffffff,stroke:#000000,stroke-width:1px;
+flowchart TB
+    %% --- ESTILIZAÇÃO VISUAL (PADRÃO DRAW.IO / CHEN) ---
+    classDef entidade fill:#ffffff,stroke:#222222,stroke-width:2px,color:#000000,font-weight:bold;
+    classDef atributo fill:#ffffff,stroke:#444444,stroke-width:1.5px,color:#222222;
+    classDef atributoPK fill:#ffffff,stroke:#000000,stroke-width:2.5px,color:#000000,font-weight:bold;
+    classDef relacao fill:#ffffff,stroke:#222222,stroke-width:1.5px,color:#000000,font-weight:bold;
+    classDef disjuncao fill:#ffffff,stroke:#222222,stroke-width:1.5px,color:#000000,font-weight:bold;
 
     %% --- ENTIDADES (RETÂNGULOS) ---
     MESA[MESA]:::entidade
@@ -13,52 +15,64 @@ graph TD
     PRODUTO[PRODUTO]:::entidade
     SUCO[SUCO]:::entidade
     SANDUICHE[SANDUICHE]:::entidade
-    SALADA[SALADA_DE_FRUTAS]:::entidade
+    SALADA[SALADA DE FRUTAS]:::entidade
 
     %% --- RELACIONAMENTOS (LOSANGOS) ---
-    R_POSSUI{VINCULA}:::relacao
-    R_CONTEM{CONTÉM}:::relacao
-    R_RECEBE{RECEBE}:::relacao
-    R_REFERENCIA{REFERENCIA}:::relacao
-    D{D}:::relacao
+    R_POSSUI{ POSSUI }:::relacao
+    R_CONTEM{ CONTÉM }:::relacao
+    R_RECEBE{ RECEBE }:::relacao
+    R_GERA{ GERA }:::relacao
+    D{ D }:::disjuncao
 
-    %% --- ATRIBUTOS (ÓVALOS) ---
-    A_m1((numero)):::atributo
-    A_m2((ocupada)):::atributo
+    %% --- ATRIBUTOS DA MESA ---
+    A_m_num([numero]):::atributoPK
+    A_m_ocup([ocupada]):::atributo
 
-    A_at1((ativo)):::atributo
+    MESA --- A_m_num
+    MESA --- A_m_ocup
 
-    A_p1((quantidade)):::atributo
+    %% --- ATRIBUTOS DO ATENDIMENTO ---
+    A_at_ativo([ativo]):::atributo
+    A_at_tot([total]):::atributo
+    A_at_pago([total_pago]):::atributo
+    A_at_saldo([saldo]):::atributo
 
-    A_pag1((valor)):::atributo
+    ATENDIMENTO --- A_at_ativo
+    ATENDIMENTO --- A_at_tot
+    ATENDIMENTO --- A_at_pago
+    ATENDIMENTO --- A_at_saldo
 
-    A_prod1((codigo)):::atributo
-    A_prod2((nome)):::atributo
-    A_prod3((preco)):::atributo
+    %% --- ATRIBUTOS DO PEDIDO ---
+    A_ped_qtd([quantidade]):::atributo
+    A_ped_sub([valor_total]):::atributo
 
-    A_s1((tamanho)):::atributo
-    A_sa1((pao)):::atributo
-    A_sf1((adicional)):::atributo
+    PEDIDO --- A_ped_qtd
+    PEDIDO --- A_ped_sub
 
-    %% --- LIGAÇÕES DOS ATRIBUTOS ---
-    MESA --- A_m1
-    MESA --- A_m2
+    %% --- ATRIBUTOS DO PAGAMENTO ---
+    A_pag_val([valor]):::atributo
 
-    ATENDIMENTO --- A_at1
+    PAGAMENTO --- A_pag_val
 
-    PEDIDO --- A_p1
+    %% --- ATRIBUTOS DO PRODUTO E SUBCLASSES ---
+    A_pr_cod([codigo]):::atributoPK
+    A_pr_nom([nome]):::atributo
+    A_pr_pre([preco]):::atributo
 
-    PAGAMENTO --- A_pag1
+    PRODUTO --- A_pr_cod
+    PRODUTO --- A_pr_nom
+    PRODUTO --- A_pr_pre
 
-    PRODUTO --- A_prod1
-    PRODUTO --- A_prod2
-    PRODUTO --- A_prod3
+    A_s_tam([tamanho]):::atributo
+    SUCO --- A_s_tam
 
-    SUCO --- A_s1
-    SANDUICHE --- A_sa1
-    SALADA --- A_sf1
+    A_sa_pao([pao]):::atributo
+    SANDUICHE --- A_sa_pao
 
-    %% --- RELACIONAMENTOS E CARDINALIDADES ---
+    A_sf_adi([adicional]):::atributo
+    SALADA --- A_sf_adi
+
+    %% --- LIGAÇÕES DE CARDINALIDADE ---
     MESA ---|1, 1| R_POSSUI
     R_POSSUI ---|0, N| ATENDIMENTO
 
@@ -68,10 +82,10 @@ graph TD
     ATENDIMENTO ---|1, 1| R_RECEBE
     R_RECEBE ---|0, N| PAGAMENTO
 
-    PEDIDO ---|0, N| R_REFERENCIA
-    R_REFERENCIA ---|1, 1| PRODUTO
+    PEDIDO ---|0, N| R_GERA
+    R_GERA ---|1, 1| PRODUTO
 
-    %% --- ESPECIALIZAÇÃO / HERANÇA (D) ---
+    %% --- HERANÇA / ESPECIALIZAÇÃO (D) ---
     PRODUTO --- D
     D --- SUCO
     D --- SANDUICHE
