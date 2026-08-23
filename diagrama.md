@@ -1,0 +1,116 @@
+```mermaid
+classDiagram
+    %% --- EXCEÇÕES ---
+    class LanchoneteError { <<exception>> }
+    class MesaOcupadaError { <<exception>> }
+    class MesaNaoEncontradaError { <<exception>> }
+    class AtendimentoEncerradoError { <<exception>> }
+    class AtendimentoNaoEncontradoError { <<exception>> }
+    class ProdutoNaoEncontradoError { <<exception>> }
+    class QuantidadeInvalidaError { <<exception>> }
+    class PagamentoInvalidoError { <<exception>> }
+    class AtendimentoNaoQuitadoError { <<exception>> }
+
+    LanchoneteError <|-- MesaOcupadaError
+    LanchoneteError <|-- MesaNaoEncontradaError
+    LanchoneteError <|-- AtendimentoEncerradoError
+    LanchoneteError <|-- AtendimentoNaoEncontradoError
+    LanchoneteError <|-- ProdutoNaoEncontradoError
+    LanchoneteError <|-- QuantidadeInvalidaError
+    LanchoneteError <|-- PagamentoInvalidoError
+    LanchoneteError <|-- AtendimentoNaoQuitadoError
+
+    %% --- MODELOS ---
+    class Mesa {
+        -int __numero
+        -bool __ocupada
+        +numero() int
+        +ocupada() bool
+        +ocupar() void
+        +desocupar() void
+    }
+
+    class Produto {
+        <<abstract>>
+        -int __codigo
+        -string __nome
+        -float __preco
+        -bool __disponivel
+        +descricao_detalhada()* string
+    }
+
+    class Suco { -string __tamanho }
+    class Sanduiche { -string __pao }
+    class SaladaDeFrutas { -string __adicional }
+
+    Produto <|-- Suco
+    Produto <|-- Sanduiche
+    Produto <|-- SaladaDeFrutas
+
+    class Pedido {
+        -int __quantidade
+        +valor_total() float
+    }
+
+    class Pagamento {
+        -float __valor
+    }
+
+    class Atendimento {
+        -bool __ativo
+        +total() float
+        +total_pago() float
+        +saldo() float
+        +adicionar_pedido(p: Pedido) void
+        +registrar_pagamento(p: Pagamento) void
+        +encerrar() void
+    }
+
+    Atendimento "1" *-- "0..*" Pedido
+    Atendimento "1" *-- "0..*" Pagamento
+    Mesa "1" <-- "0..*" Atendimento
+    Pedido "*" --> "1" Produto
+
+    %% --- APLICAÇÃO ---
+    class Lanchonete {
+        -list~Mesa~ __mesas
+        -list~Produto~ __produtos
+        -list~Atendimento~ __atendimentos
+        -list~Atendimento~ __historico
+    }
+
+    Lanchonete "1" o-- "*" Mesa
+    Lanchonete "1" o-- "*" Produto
+    Lanchonete "1" o-- "*" Atendimento
+
+    %% --- INTERFACE ---
+    class Menu { <<abstract>> #Lanchonete _lanchonete }
+    class MenuPrincipal
+    class MenuMesas
+    class MenuProdutos
+    class MenuAtendimentos
+
+    Menu <|-- MenuPrincipal
+    Menu <|-- MenuMesas
+    Menu <|-- MenuProdutos
+    Menu <|-- MenuAtendimentos
+
+    class Tela { <<abstract>> #Lanchonete _lanchonete }
+    class TelaMesas
+    class TelaProdutos
+    class TelaAtendimentos
+
+    Tela <|-- TelaMesas
+    Tela <|-- TelaProdutos
+    Tela <|-- TelaAtendimentos
+
+    MenuMesas --> TelaMesas
+    MenuProdutos --> TelaProdutos
+    MenuAtendimentos --> TelaAtendimentos
+
+    MenuPrincipal --> MenuMesas
+    MenuPrincipal --> MenuProdutos
+    MenuPrincipal --> MenuAtendimentos
+
+    Tela --> Lanchonete
+```
