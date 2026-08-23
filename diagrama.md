@@ -1,61 +1,79 @@
 ```mermaid
-erDiagram
-    %% --- ENTIDADES E ATRIBUTOS ---
-    PESSOA {
-        int id_pessoa PK
-        string nome
-        string cpf
-        string email
-    }
+graph TD
+    %% --- ESTILOS DE NÓS (NOTAÇÃO DE CHEN) ---
+    classDef entidade fill:#ffffff,stroke:#000000,stroke-width:2px;
+    classDef atributo fill:#ffffff,stroke:#000000,stroke-width:1px;
+    classDef relacao fill:#ffffff,stroke:#000000,stroke-width:1px;
 
-    CLIENTE {
-        string numero_passaporte
-    }
+    %% --- ENTIDADES (RETÂNGULOS) ---
+    MESA[MESA]:::entidade
+    ATENDIMENTO[ATENDIMENTO]:::entidade
+    PEDIDO[PEDIDO]:::entidade
+    PAGAMENTO[PAGAMENTO]:::entidade
+    PRODUTO[PRODUTO]:::entidade
+    SUCO[SUCO]:::entidade
+    SANDUICHE[SANDUICHE]:::entidade
+    SALADA[SALADA_DE_FRUTAS]:::entidade
 
-    CONSULTOR {
-        date data_contratacao
-    }
+    %% --- RELACIONAMENTOS (LOSANGOS) ---
+    R_POSSUI{VINCULA}:::relacao
+    R_CONTEM{CONTÉM}:::relacao
+    R_RECEBE{RECEBE}:::relacao
+    R_REFERENCIA{REFERENCIA}:::relacao
+    D{D}:::relacao
 
-    SERVICO {
-        int id_servico PK
-        string descricao
-        float valor_base
-    }
+    %% --- ATRIBUTOS (ÓVALOS) ---
+    A_m1((numero)):::atributo
+    A_m2((ocupada)):::atributo
 
-    PROCESSO {
-        int id_processo PK
-        date data_inicio
-        string status_geral
-    }
+    A_at1((ativo)):::atributo
 
-    DOCUMENTO {
-        int id_documento PK
-        string tipo_documento
-        string status_validacao
-    }
+    A_p1((quantidade)):::atributo
 
-    PAIS {
-        int id_pais PK
-        string nome
-        string continente
-    }
+    A_pag1((valor)):::atributo
 
-    ESPECIALIDADE {
-        int id_especialidade PK
-        int id_pessoa FK
-        int id_pais FK
-    }
+    A_prod1((codigo)):::atributo
+    A_prod2((nome)):::atributo
+    A_prod3((preco)):::atributo
 
-    %% --- HERANÇA / ESPECIALIZAÇÃO (D) ---
-    PESSOA ||--o| CLIENTE : "Disjunção (D)"
-    PESSOA ||--o| CONSULTOR : "Disjunção (D)"
+    A_s1((tamanho)):::atributo
+    A_sa1((pao)):::atributo
+    A_sf1((adicional)):::atributo
+
+    %% --- LIGAÇÕES DOS ATRIBUTOS ---
+    MESA --- A_m1
+    MESA --- A_m2
+
+    ATENDIMENTO --- A_at1
+
+    PEDIDO --- A_p1
+
+    PAGAMENTO --- A_pag1
+
+    PRODUTO --- A_prod1
+    PRODUTO --- A_prod2
+    PRODUTO --- A_prod3
+
+    SUCO --- A_s1
+    SANDUICHE --- A_sa1
+    SALADA --- A_sf1
 
     %% --- RELACIONAMENTOS E CARDINALIDADES ---
-    CLIENTE ||--o{ PROCESSO : "SOLICITA (1,1 : 0,N)"
-    SERVICO ||--o{ PROCESSO : "GERA (1,1 : 0,N)"
-    CONSULTOR ||--o{ PROCESSO : "GERENCIA (1,1 : 0,N)"
-    PROCESSO ||--|{ DOCUMENTO : "EXIGE (1,1 : 1,N)"
-    PROCESSO }|--|| PAIS : "DESTINO (1,1 : 1,1)"
-    CONSULTOR ||--|{ ESPECIALIDADE : "ESPECIALISTA (0,N : 1,N)"
-    PAIS ||--o{ ESPECIALIDADE : "associa (0,N : 0,N)"
+    MESA ---|1, 1| R_POSSUI
+    R_POSSUI ---|0, N| ATENDIMENTO
+
+    ATENDIMENTO ---|1, 1| R_CONTEM
+    R_CONTEM ---|0, N| PEDIDO
+
+    ATENDIMENTO ---|1, 1| R_RECEBE
+    R_RECEBE ---|0, N| PAGAMENTO
+
+    PEDIDO ---|0, N| R_REFERENCIA
+    R_REFERENCIA ---|1, 1| PRODUTO
+
+    %% --- ESPECIALIZAÇÃO / HERANÇA (D) ---
+    PRODUTO --- D
+    D --- SUCO
+    D --- SANDUICHE
+    D --- SALADA
 ```
